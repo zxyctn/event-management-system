@@ -5,8 +5,6 @@ import Login from './routes/Login';
 import SignUp from './routes/SignUp';
 import Events from './routes/Events';
 import Event from './routes/Event';
-import CreateEvent from './routes/CreateEvent';
-import EditEvent from './routes/EditEvent';
 
 const App = () => {
   const router = createBrowserRouter([
@@ -28,16 +26,8 @@ const App = () => {
           element: <Events />,
         },
         {
-          path: 'create',
-          element: <CreateEvent />,
-        },
-        {
           path: ':id',
           element: <Event />,
-        },
-        {
-          path: ':id/edit',
-          element: <EditEvent />,
         },
       ],
     },
