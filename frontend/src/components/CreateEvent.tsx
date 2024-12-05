@@ -100,6 +100,7 @@ const CreateEvent = () => {
                   name='duration'
                   onChange={(e) => setDuration(+e.target.value)}
                   className='input input-bordered w-full'
+                  min={1}
                   required
                 />
               </label>

@@ -65,7 +65,6 @@ const Event = () => {
     if (!ws) return;
 
     ws.onmessage = (e) => {
-      console.log(e);
       const data = JSON.parse(e.data);
       if (data.type === 'event_instance_update') {
         const event = data.event;

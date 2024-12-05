@@ -110,6 +110,7 @@ const SignUp = () => {
                 placeholder='Password'
                 value={password}
                 name='password'
+                minLength={8}
                 onChange={(e) => setPassword(e.target.value)}
                 className='input input-bordered w-full max-w-xs'
                 required
@@ -124,6 +125,7 @@ const SignUp = () => {
                 placeholder='Password'
                 value={password2}
                 name='password2'
+                minLength={8}
                 onChange={(e) => setPassword2(e.target.value)}
                 className='input input-bordered w-full max-w-xs'
                 required

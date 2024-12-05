@@ -77,6 +77,7 @@ const Login = () => {
                 name='password'
                 onChange={(e) => setPassword(e.target.value)}
                 className='input input-bordered w-full max-w-xs'
+                minLength={8}
                 required
               />
             </label>

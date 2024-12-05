@@ -41,7 +41,6 @@ const Events = () => {
     if (!ws) return;
 
     ws.onmessage = (e) => {
-      console.log(e);
       const data = JSON.parse(e.data);
       if (data.type === 'event_update') {
         const event = data.event;
@@ -71,6 +70,7 @@ const Events = () => {
             return updatedEvents;
           });
         } else if (event.type === 'created') {
+          console.log('Event created:', event.data);
           setEvents((prevEvents) => [...prevEvents, event.data]);
         }
       }
