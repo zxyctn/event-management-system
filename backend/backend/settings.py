@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 
@@ -29,7 +30,7 @@ SECRET_KEY = "django-insecure-tgtt9q!67r@h_9!^j93n(d66rk&==_p#v0kklto!f#xtex+pxx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
@@ -86,13 +87,20 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgres://postgres:postgres@localhost:5432/backend_db"
+)
+parsed_db_url = urlparse(DATABASE_URL)
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": parsed_db_url.path[1:],
+        "USER": parsed_db_url.username,
+        "PASSWORD": parsed_db_url.password,
+        "HOST": parsed_db_url.hostname,
+        "PORT": parsed_db_url.port,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -154,7 +162,12 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [
+                (
+                    os.getenv("REDIS_HOST", "127.0.0.1"),
+                    int(os.getenv("REDIS_PORT", 6379)),
+                )
+            ],
         },
     },
 }
