@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Users } from 'lucide-react';
 
@@ -14,7 +14,7 @@ import {
 import toast from 'react-hot-toast';
 
 const Event = () => {
-  let ws = useRef<WebSocket | null>(null);
+  let ws: WebSocket | null = null;
   const id = useParams<{ id: string }>().id || '';
   const navigate = useNavigate();
   const [user, setUser] = useState<{ id: number; username: string } | null>(
@@ -52,21 +52,19 @@ const Event = () => {
   }, [id]);
 
   useEffect(() => {
-    ws.current = new WebSocket(`ws://localhost:8000/ws/event/${id}/`);
-    ws.current.onopen = () => console.log(`Connected to event ${id}`);
-    ws.current.onclose = () => console.log(`Disconnected from event ${id}`);
-
-    const wsCurrent = ws.current;
+    ws = new WebSocket(`ws://localhost:8000/ws/event/${id}/`);
+    ws.onopen = () => console.log(`Connected to event ${id}`);
+    ws.onclose = () => console.log(`Disconnected from event ${id}`);
 
     return () => {
-      wsCurrent.close();
+      ws?.close();
     };
   }, []);
 
   useEffect(() => {
-    if (!ws.current) return;
+    if (!ws) return;
 
-    ws.current.onmessage = (e) => {
+    ws.onmessage = (e) => {
       console.log(e);
       const data = JSON.parse(e.data);
       if (data.type === 'event_instance_update') {
@@ -96,7 +94,7 @@ const Event = () => {
         }
       }
     };
-  }, [ws.current]);
+  }, [ws]);
 
   return (
     <div className='flex flex-col py-4 px-8 gap-12'>

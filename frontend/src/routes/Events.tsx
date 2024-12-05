@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar, Clock, MapPin, User as UserIcon, Users } from 'lucide-react';
 
 import CreateEvent from '../components/CreateEvent';
@@ -15,7 +15,7 @@ import {
 import type { Event, User } from '../types';
 
 const Events = () => {
-  let ws = useRef<WebSocket | null>(null);
+  let ws: WebSocket | null = null;
   const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [user, setUser] = useState<User | null>(null);
@@ -28,21 +28,19 @@ const Events = () => {
   }, []);
 
   useEffect(() => {
-    ws.current = new WebSocket('ws://localhost:8000/ws/events/');
-    ws.current.onopen = () => console.log('Connected to global events');
-    ws.current.onclose = () => console.log('Disconnected from global events');
-
-    const wsCurrent = ws.current;
+    ws = new WebSocket('ws://localhost:8000/ws/events/');
+    ws.onopen = () => console.log('Connected to global events');
+    ws.onclose = () => console.log('Disconnected from global events');
 
     return () => {
-      wsCurrent.close();
+      ws?.close();
     };
   }, []);
 
   useEffect(() => {
-    if (!ws.current) return;
+    if (!ws) return;
 
-    ws.current.onmessage = (e) => {
+    ws.onmessage = (e) => {
       console.log(e);
       const data = JSON.parse(e.data);
       if (data.type === 'event_update') {
@@ -77,7 +75,7 @@ const Events = () => {
         }
       }
     };
-  }, [ws.current]);
+  }, [ws]);
 
   const logOut = async () => {
     const response = await fetch('http://localhost:8000/logout/', {
@@ -101,7 +99,7 @@ const Events = () => {
     }
   };
 
-  return events.length > 0 ? (
+  return (
     <div className='w-full h-full flex justify-center p-8 py-4'>
       <div className='flex flex-col gap-4 w-full'>
         <div className='flex w-full justify-start pb-4'>
@@ -112,6 +110,11 @@ const Events = () => {
         <h1 className='text-3xl font-semibold'>Events</h1>
         <hr className='opacity-10' />
         <CreateEvent />
+        {events.length === 0 && (
+          <div className='py-8 px-4 flex text-neutral-content justify-center bg-neutral rounded-lg italic'>
+            There are no events yet...
+          </div>
+        )}
         {events.map((event) => (
           <div
             key={event.id}
@@ -205,8 +208,6 @@ const Events = () => {
         ))}
       </div>
     </div>
-  ) : (
-    <div>There are no events yet...</div>
   );
 };
 
