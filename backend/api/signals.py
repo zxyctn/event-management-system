@@ -24,6 +24,7 @@ def event_created_or_updated(sender, instance, created, **kwargs):
             "id": instance.organizer.id,
             "username": instance.organizer.username,
         },
+        "duration": instance.duration,
         "joiners": [
             {"id": joiner.id, "username": joiner.username}
             for joiner in instance.joiners.all()
