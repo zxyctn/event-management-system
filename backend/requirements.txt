@@ -5,4 +5,4 @@ django-cors-headers==4.6.0
 channels==4.2.0
 channels_redis==4.2.1
 python-dotenv==1.0.1
-uvicorn-[standard]==0.32.1
+uvicorn[standard]==0.32.1
