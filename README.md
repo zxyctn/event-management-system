@@ -24,16 +24,9 @@ The project uses **Redis** for WebSockets. To configure Redis, install Redis and
 
 ### Installation
 
-1. Clone the repository
-2. Install the required packages
-3. Make migrations and migrate
-4. Run the server
-
-#### Clone the repository
-
-```bash
-git clone https://github.com/zxyctn/event-management-system.git
-```
+1. Install the required packages
+2. Make migrations and migrate
+3. Run the server
 
 #### Install the required packages
 
