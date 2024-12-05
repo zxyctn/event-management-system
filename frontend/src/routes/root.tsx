@@ -17,10 +17,10 @@ const Root = () => {
 
   return (
     <div className='w-screen h-screen flex justify-center'>
-      <div className='max-w-[1200px] grow'>
+      <div className='relative max-w-[1200px] grow'>
         <Toaster />
         <Outlet />
-        <div className='fixed top-4 left-4'>
+        <div className='absolute top-4 right-8'>
           <ThemeToggler />
         </div>
       </div>

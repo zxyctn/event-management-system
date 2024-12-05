@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Calendar, Clock, MapPin, User as UserIcon, Users } from 'lucide-react';
 
 import CreateEvent from '../components/CreateEvent';
@@ -15,6 +15,7 @@ import {
 import type { Event, User } from '../types';
 
 const Events = () => {
+  let ws = useRef<WebSocket | null>(null);
   const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [user, setUser] = useState<User | null>(null);
@@ -25,6 +26,58 @@ const Events = () => {
       getEvents().then((data) => setEvents(data)),
     ]);
   }, []);
+
+  useEffect(() => {
+    ws.current = new WebSocket('ws://localhost:8000/ws/events/');
+    ws.current.onopen = () => console.log('Connected to global events');
+    ws.current.onclose = () => console.log('Disconnected from global events');
+
+    const wsCurrent = ws.current;
+
+    return () => {
+      wsCurrent.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!ws.current) return;
+
+    ws.current.onmessage = (e) => {
+      console.log(e);
+      const data = JSON.parse(e.data);
+      if (data.type === 'event_update') {
+        const event = data.event;
+        if (
+          event.type === 'joiner_created' ||
+          event.type === 'joiner_deleted'
+        ) {
+          const { event_id: eventId, joiners } = event.data;
+
+          setEvents((prevEvents) => {
+            const updatedEvents = prevEvents.map((prevEvent) => {
+              if (prevEvent.id === eventId) {
+                return {
+                  ...prevEvent,
+                  joiners: joiners,
+                };
+              }
+              return prevEvent;
+            });
+            return updatedEvents;
+          });
+        } else if (event.type === 'deleted') {
+          setEvents((prevEvents) => {
+            const updatedEvents = prevEvents.filter(
+              (prevEvent) => prevEvent.id !== event.data.id
+            );
+            return updatedEvents;
+          });
+        } else if (event.type === 'created') {
+          setEvents((prevEvents) => [...prevEvents, event.data]);
+        }
+      }
+    };
+  }, [ws.current]);
 
   const logOut = async () => {
     const response = await fetch('http://localhost:8000/logout/', {
@@ -49,10 +102,10 @@ const Events = () => {
   };
 
   return events.length > 0 ? (
-    <div className='w-full h-full flex justify-center p-8'>
+    <div className='w-full h-full flex justify-center p-8 py-4'>
       <div className='flex flex-col gap-4 w-full'>
-        <div className='flex w-full justify-end'>
-          <button className='btn btn-accent w-max' onClick={logOut}>
+        <div className='flex w-full justify-start pb-4'>
+          <button className='btn btn-outline w-max' onClick={logOut}>
             Log out
           </button>
         </div>

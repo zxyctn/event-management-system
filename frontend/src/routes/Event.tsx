@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Users } from 'lucide-react';
 
@@ -11,8 +11,10 @@ import {
   deleteEvent,
   getUser,
 } from '../utils/utils';
+import toast from 'react-hot-toast';
 
 const Event = () => {
+  let ws = useRef<WebSocket | null>(null);
   const id = useParams<{ id: string }>().id || '';
   const navigate = useNavigate();
   const [user, setUser] = useState<{ id: number; username: string } | null>(
@@ -49,8 +51,55 @@ const Event = () => {
     Promise.all([getUser().then((data) => setUser(data)), fetchEvent()]);
   }, [id]);
 
+  useEffect(() => {
+    ws.current = new WebSocket(`ws://localhost:8000/ws/event/${id}/`);
+    ws.current.onopen = () => console.log(`Connected to event ${id}`);
+    ws.current.onclose = () => console.log(`Disconnected from event ${id}`);
+
+    const wsCurrent = ws.current;
+
+    return () => {
+      wsCurrent.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!ws.current) return;
+
+    ws.current.onmessage = (e) => {
+      console.log(e);
+      const data = JSON.parse(e.data);
+      if (data.type === 'event_instance_update') {
+        const event = data.event;
+        if (
+          event.type === 'joiner_created' ||
+          event.type === 'joiner_deleted'
+        ) {
+          const { joiners } = event.data;
+
+          setEvent((prevEvent) => {
+            return {
+              ...prevEvent,
+              joiners: joiners,
+            };
+          });
+        } else if (event.type === 'deleted') {
+          toast.error(
+            'Event has been deleted. You are being directed to Events page.',
+            {
+              duration: 5000,
+            }
+          );
+          setTimeout(() => {
+            navigate('/');
+          }, 5000);
+        }
+      }
+    };
+  }, [ws.current]);
+
   return (
-    <div className='flex flex-col py-4 gap-12'>
+    <div className='flex flex-col py-4 px-8 gap-12'>
       <button
         className='btn btn-ghost text-xl flex items-center gap-2 w-max'
         onClick={() => navigate('/')}
@@ -58,7 +107,7 @@ const Event = () => {
         <ArrowLeft size={24} />
         <span>Back</span>
       </button>
-      <div className='px-10'>
+      <div className=''>
         <div className='flex flex-col gap-8'>
           <div className='flex justify-between gap-4 items-center'>
             <div className='flex gap-2 items-center text-3xl'>
