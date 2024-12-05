@@ -15,7 +15,6 @@ export const refreshToken = async (): Promise<string | null> => {
     console.error('Failed to refresh token:', error);
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    window.location.href = '/login';
 
     return null;
   }
