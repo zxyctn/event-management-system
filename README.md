@@ -4,6 +4,16 @@ This is a simple event management system that allows users to create, view, and 
 
 ## Backend configuration
 
+The backend API is configured to run on **Docker**. You can also run it locally without Docker.
+
+### Run on Docker
+
+To run the backend on Docker, run the following command:
+
+```bash
+docker-compose up
+```
+
 ### Database configuration
 
 The database used in this project is **PostgreSQL**. To configure the database, create a database in PostgreSQL and configure the `settings.py` and `DATABASE_URL` environment variable in the `.env` file.
