@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
@@ -29,7 +31,7 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="auth_logout"),
     path("api/events/<int:id>/join/", JoinEventView.as_view(), name="join_event"),
     path("api/events/<int:id>/leave/", LeaveEventView.as_view(), name="leave_event"),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
 websocket_urlpatterns = [
