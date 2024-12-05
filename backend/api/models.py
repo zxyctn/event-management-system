@@ -18,12 +18,6 @@ class Event(models.Model):
         return self.title
 
 
-@receiver(post_save, sender=Event)
-def create_event_participant(sender, instance, created, **kwargs):
-    if created:
-        EventJoiner.objects.create(event=instance, joiner=instance.organizer)
-
-
 class EventJoiner(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     joiner = models.ForeignKey("auth.User", on_delete=models.CASCADE)
