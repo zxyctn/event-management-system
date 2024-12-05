@@ -2,6 +2,8 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
 
+import ThemeToggler from '../components/ThemeToggler';
+
 const Root = () => {
   const navigate = useNavigate();
 
@@ -18,6 +20,9 @@ const Root = () => {
       <div className='max-w-[1200px] grow'>
         <Toaster />
         <Outlet />
+        <div className='fixed top-4 left-4'>
+          <ThemeToggler />
+        </div>
       </div>
     </div>
   );
